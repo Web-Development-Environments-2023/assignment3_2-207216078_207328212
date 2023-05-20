@@ -11,14 +11,14 @@ var httpsOptions = {
 /**
  * Get port from environment and store in Express.
  */
-var port = normalizePort(process.env.PORT || '443');
+var port = normalizePort(process.env.PORT || '3000'); //change from 443
 
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
-var server = https.createServer(httpsOptions, app);
+var server = https.createServer(httpsOptions,app); // remove httpsOptions, 
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -82,3 +82,11 @@ function onListening() {
     : 'port ' + addr.port;
     console.log(`Server listen in port ${port} in adrress ${addr.address}`);
 }
+
+// function onListening() {
+//   var addr = server.address();
+//   var bind = typeof addr === 'string'
+//     ? 'pipe ' + addr
+//     : 'port ' + addr.port;
+//   console.log(`Server listening on port ${port}`);
+// }
