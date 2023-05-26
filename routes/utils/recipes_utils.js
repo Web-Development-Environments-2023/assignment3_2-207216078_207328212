@@ -84,8 +84,9 @@ async function getRandomThreeRecipes(user_id) {
     if (filtered_random_pool < 3) {
         return getRandomThreeRecipes(user_id);
     }
-    const recipes_ids_lst = filtered_random_pool.data.slice(0,3).map(recipe => recipe.id);
-    return getRecipesPreview(recipes_ids_lst, user_id)
+  //  const recipes_ids_lst = filtered_random_pool.data.slice(0,3).map(recipe => recipe.id);
+    return getRecipesPreview([filtered_random_pool[0].id,filtered_random_pool[1].id,filtered_random_pool[2].id],user_id)
+ //   return getRecipesPreview(recipes_ids_lst, user_id)
 }
 
 async function getRandomRecipes() {
@@ -102,22 +103,22 @@ async function getRandomRecipes() {
  * search for a recipe
  * noy
 */
-async function searchRecipes(user_id, query) {
+async function searchRecipes(user_id, query, search_params) {
  const {cuisine, diet, intolerance, number} = search_params;
  const response = await axios.get(`${api_domain}/complexSearch`, {
     params: {
         number: number,
         apiKey: process.env.spooncular_apiKey,
         query: query,
-        // cuisine: cuisine,
-        // diet: diet,
-        // intolerance: intolerance
+        cuisine: cuisine,
+        diet: diet,
+        intolerance: intolerance
     }
 });  
 const recipes_ids_lst = response.data.results.map((recipe_info) => {
     let id;
-    if (recipe_info.results) {
-        id = recipe_info.results.id;
+    if (recipe_info.id) {
+        id = recipe_info.id;
     }
     return id;
 }) 

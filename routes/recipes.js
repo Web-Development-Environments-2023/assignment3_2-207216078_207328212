@@ -6,18 +6,6 @@ const recipes_utils = require("./utils/recipes_utils");
 
 
 /**
- * This path returns a full details of a recipe by its id
- */
-router.get("/:recipeId", async (req, res, next) => {
-  try {
-    const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
-    res.send(recipe);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
  * This path returns 3 random recipes
  */
 router.get("/random", async (req, res, next) => {
@@ -29,16 +17,32 @@ router.get("/random", async (req, res, next) => {
   }
 });
 
+
+
 /**
  * search recipe page by user
  */
 router.get("/search/:query", async (req, res, next) => {
   try {
-    const recipes = await recipes_utils.searchRecipes(req.session.user_id, req.params.query);
+    const recipes = await recipes_utils.searchRecipes(req.session.user_id, req.params.query, req.query);
     res.send(recipes);
   } catch (error) {
     next(error);
   }
 });
+
+
+/**
+ * This path returns a full details of a recipe by its id
+ */
+router.get("/:recipeId", async (req, res, next) => {
+  try {
+    const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
+    res.send(recipe);
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 module.exports = router;
