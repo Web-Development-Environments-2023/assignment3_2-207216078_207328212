@@ -38,8 +38,12 @@ async function getRecipeDetails(recipe_id) {
     }
 }
 
-// function for create preview of recipe
-// noy 
+/**
+ * function for create preview of recipe
+* params: recipes_id_array - array of recipes id's to preview
+          user_id - loggen in user's id
+* return: preview of all recipes
+ */
 async function getRecipesPreview(recipes_id_array, user_id) {
     let promises = recipes_id_array.map(async (recipe_id) => {
         const recipe_information = await getRecipeInformation(recipe_id);
@@ -63,10 +67,10 @@ async function getRecipesPreview(recipes_id_array, user_id) {
 
 
 /**
- * helper function to determine whether a recipe marked as favorite by user
- * params: recipe_id, user_id
+ * helper function to determine whether a recipe marked as favorite by a user
+ * params: recipe_id - recipe to determine isFavorite
+ *         user_id - recipe is favorite by this user
  * return: boolean
- * noy
  */
 async function checkIsFavorite(recipe_id, user_id) {
     let favorites = await DButils.execQuery(`select * from favoriterecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
@@ -76,7 +80,7 @@ async function checkIsFavorite(recipe_id, user_id) {
 
 /**
  * return 3 random recips
- * noy
+ * parames: user_id - loggen in user's id
 */
 async function getRandomThreeRecipes(user_id) {
     let random_pool = await getRandomRecipes();
@@ -84,11 +88,13 @@ async function getRandomThreeRecipes(user_id) {
     if (filtered_random_pool < 3) {
         return getRandomThreeRecipes(user_id);
     }
-  //  const recipes_ids_lst = filtered_random_pool.data.slice(0,3).map(recipe => recipe.id);
     return getRecipesPreview([filtered_random_pool[0].id,filtered_random_pool[1].id,filtered_random_pool[2].id],user_id)
- //   return getRecipesPreview(recipes_ids_lst, user_id)
 }
 
+/**
+ * helper function to return 3 ramdon recipes
+ * this function creates the HTTP requset to spoonacular to retrieve random recipes
+*/
 async function getRandomRecipes() {
     const response = await axios.get(`${api_domain}/random`, {
         params: {
@@ -101,7 +107,9 @@ async function getRandomRecipes() {
 
 /**
  * search for a recipe
- * noy
+ * params: user_id - recipe is favorite by this user
+ *         query - name of the dish / recipe
+ *         search_params - params to filter search results such as diet, suisine
 */
 async function searchRecipes(user_id, query, search_params) {
  const {cuisine, diet, intolerance, number} = search_params;

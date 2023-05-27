@@ -133,6 +133,73 @@ paths:
                 $ref: '#/components/schemas/RecipePreview'
         "404":
           description: recipeId is not exists
+  /recipes/random:
+  get:
+    tags:
+    - Recipes
+    summary: Return 3 random recipes
+    description: Return preview details 3 random recipes
+    responses:
+      "200":
+        description: random recipes returned successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipePreview'
+      "404":
+        description: recipes not found
+
+/recipes/search/:query:
+get:
+  tags:
+  - Recipes
+  summary: Search Recipes
+  description: Search recipe using query to filter wanted recipes
+  parameters:
+    - name: number
+    in: path
+    description: number of recipes, 5/10/15
+    required: true
+    schema:
+      type: integer
+      example: 10
+    - name: query
+    in: path
+    description: Name of the food / recipe wanted
+    required: true
+    schema:
+      type: string
+      example: pasta
+    - name: cuisine
+    in: path
+    description: Cuisin(s) of the recipes, seperated by comma
+    required: false
+    schema:
+      type: string
+      example: italian
+    - name: diet
+    in: path
+    description: The diet(s) in which the recipes must be suitible, seperated by comma
+    required: false
+    schema:
+      type: string
+      example: vegeterian
+    - name: intolerance
+    in: path
+    description: All recipes returned must not contain ingredients enteres, seperated by comma
+    required: false
+    schema:
+      type: string
+      example: gluten
+  responses:
+    "200":
+      description: Desired recipes returned successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecipePreview'
+    "404":
+      description: Search failed
 components:
   schemas:
     User:
