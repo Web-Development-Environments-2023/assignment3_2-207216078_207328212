@@ -35,6 +35,8 @@ paths:
           description: A new user has been added
         "400":
           description: wrong input parameters
+        "409":
+          description: username taken
   /login:
     post:
       tags:
@@ -105,6 +107,135 @@ paths:
       responses:
         "200":
           description: The Recipe successfully saved as favorite
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+  /users/seen:
+    get:
+      tags:
+      - Users
+      summary: Return the last three recipes seen by the the loggen in user
+      description: Get an array of recipes that were seen by a specific user
+      responses:
+        "200":
+          description: data about the user's last 3 seen recipes returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+    post:
+      tags:
+      - Users
+      summary: save recipe in the seen list of a user
+      description: save recipe in the seen list of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reciepeId:
+                  type: string
+                  description: reciepe's id which the user seen
+                  example: 716429
+      responses:
+        "200":
+          description: The Recipe successfully saved as seen
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+  /users/createRecipe:
+    post:
+      tags:
+      - Users
+      summary: Add new recipe by the loggen-in user
+      description: Add the recipe to the list of the logged-in user list of recipes
+      parameters:
+      - name: title
+      in: body
+      description: title of recipes
+      required: true
+      schema:
+        type: string
+        example: "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs"
+      - name: image
+      in: body
+      description: path to image of dish
+      required: true
+      schema:
+        type: string
+        example: "https://spoonacular.com/recipeImages/716429-556x370.jpg"
+      - name: readyInMinutes
+      in: body
+      description: time of ,aking the recipes in minutes
+      required: true
+      schema:
+        type: integer
+        example: 45
+      - name: vegan
+      in: body
+      description: is the dish vegan 
+      required: true
+      schema:
+        type: boolean
+        example: false
+      - name: vegetarian
+      in: body
+      description: is the dish vegetarian
+      required: true
+      schema:
+        type: boolean
+        example: false
+      - name: glutenFree
+      in: body
+      description: is the dish glutenFree
+      required: true
+      schema:
+        type: boolean
+        example: false
+      - name: servings
+      in: body
+      description: amount of servings made by the recipe
+      required: true
+      schema:
+        type: integer
+        example: 2
+      responses:
+        "200":
+          description: Recipe successfully saved to user's list of recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: One or more details are missing
+      security:
+      - cookieAuth: []
+  /users/myRecips:
+    get:
+      tags:
+      - Users
+      summary: Return list of the user's recipes
+      description: Get an array of recipes that were created by a specific user
+      responses:
+        "200":
+          description: user's recipes returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
         "401":
           description: user is not authorized
       security:
@@ -191,6 +322,29 @@ get:
     schema:
       type: string
       example: gluten
+  responses:
+    "200":
+      description: Desired recipes returned successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RecipePreview'
+    "404":
+      description: Search failed
+/recipes/extendInfo/:recipeId:
+get:
+  tags:
+  - Recipes
+  summary: return details of recipe by id
+  description: Search recipe using id and get full information of the recipe
+  parameters:
+    - name: recipe_id
+    in: path
+    description: id of desired recipe
+    required: true
+    schema:
+      type: integer
+      example: 716429
   responses:
     "200":
       description: Desired recipes returned successfully

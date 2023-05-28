@@ -48,10 +48,10 @@ router.get("/:recipeId", async (req, res, next) => {
 /**
  * This path returns a full details of a recipe by its id
  */
-router.get("/extendInfo/:recipeId", async (req, res, next) => {
+router.get("/extendInfo/:recipe_id", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
-    const recipe = await recipes_utils.presentRecipe(req.params.recipeId, user_id);
+    const recipe = await recipes_utils.presentRecipe(req.params.recipe_id, user_id);
     res.send(recipe);
   } catch (error) {
     next(error);
