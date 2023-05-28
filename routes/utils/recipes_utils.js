@@ -38,6 +38,31 @@ async function getRecipeDetails(recipe_id) {
     }
 }
 
+
+
+async function presentRecipe(recipe_id,user_id) {
+    const recipe_information = await getRecipeInformation(recipe_id);
+    const isFavorite = await checkIsFavorite(recipe_id, user_id);
+    const isSeen = await checkIsSeen(recipe_id, user_id);
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients } = recipe_information.data;
+
+    return {
+        id: recipe_information.data.id,
+        title: recipe_information.data.title,
+        image: recipe_information.data.image,
+        readyInMinutes: recipe_information.data.readyInMinutes,
+        popularity: recipe_information.data.aggregateLikes,
+        vegan: recipe_information.data.vegan,
+        vegetarian: recipe_information.data.vegetarian,
+        glutenFree: recipe_information.data.glutenFree,
+        seen: isSeen,
+        favorite: isFavorite,
+        servings: recipe_information.data.servings,
+        instructions: recipe_information.data.instructions,
+        extendedIngredients: recipe_information.data.extendedIngredients
+    };
+}
+
 /**
  * function for create preview of recipe
 * params: recipes_id_array - array of recipes id's to preview
@@ -48,6 +73,7 @@ async function getRecipesPreview(recipes_id_array, user_id) {
     let promises = recipes_id_array.map(async (recipe_id) => {
         const recipe_information = await getRecipeInformation(recipe_id);
         const isFavorite = await checkIsFavorite(recipe_id, user_id);
+        const isSeen = await checkIsSeen(recipe_id, user_id);
         return {
             id: recipe_information.data.id,
             title: recipe_information.data.title,
@@ -57,13 +83,45 @@ async function getRecipesPreview(recipes_id_array, user_id) {
             vegan: recipe_information.data.vegan,
             vegetarian: recipe_information.data.vegetarian,
             glutenFree: recipe_information.data.glutenFree,
-            // seen
-            favorite: isFavorite
+            seen: isSeen,
+            favorite: isFavorite,
+            instructions: recipe_information.data.instructions
         };
     });
     let ans = await Promise.all(promises);
     return ans;
 }
+
+
+/**
+ * function for create preview of my recipe
+* params: recipes_id_array - array of recipes id's to preview
+          user_id - loggen in user's id
+* return: preview of all recipes
+ */
+async function getMyRecipesPreview(recipes_id_array, user_id) {
+    let promises = recipes_id_array.map(async (recipe_id) => {
+        const recipe_information = await DButils.execQuery(`select * from userrecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
+        const isFavorite = true;
+        const isSeen = true;
+        const extract_details = recipe_information.map(recipe => ({
+            title: recipe.title,
+            id: recipe.recipe_id,
+            readyInMinutes: recipe.readyInMinutes,
+            image: recipe.image,
+            popularity: 0,
+            vegan: recipe.vegan === 'true',
+            vegetarian: recipe.vegetarian === 'true',
+            glutenFree: recipe.glutenFree === 'true',
+            seen: isFavorite,
+            favorite: isSeen
+          }));
+          return extract_details;
+    });
+    let ans = await Promise.all(promises);
+    return ans;
+}
+
 
 
 /**
@@ -73,9 +131,30 @@ async function getRecipesPreview(recipes_id_array, user_id) {
  * return: boolean
  */
 async function checkIsFavorite(recipe_id, user_id) {
-    let favorites = await DButils.execQuery(`select * from favoriterecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
-    return favorites.length > 0;
+    let favorites = await DButils.execQuery(`select recipe_id from favoriterecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
+    if(favorites.length > 0){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
+
+
+
+/**
+ * helper function to determine whether a recipe marked as seen by a user
+ * params: recipe_id - recipe to determine isSeen
+ *         user_id - recipe seen by this user
+ * return: boolean
+ */
+async function checkIsSeen(recipe_id, user_id) {
+    let seen = await DButils.execQuery(`select * from seenrecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
+    return seen.length > 0;
+}
+
+
+
 
 
 /**
@@ -135,6 +214,11 @@ return getRecipesPreview(recipes_ids_lst, user_id);
 
 
 
+
+exports.getMyRecipesPreview = getMyRecipesPreview
+exports.presentRecipe = presentRecipe;
+exports.checkIsSeen = checkIsSeen;
+exports.checkIsFavorite = checkIsFavorite;
 exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getRandomThreeRecipes = getRandomThreeRecipes;
