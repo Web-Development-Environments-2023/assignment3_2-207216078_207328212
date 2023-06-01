@@ -109,7 +109,7 @@ async function getMyRecipesPreview(recipes_id_array, user_id) {
             id: recipe.recipe_id,
             readyInMinutes: recipe.readyInMinutes,
             image: recipe.image,
-            popularity: 0,
+            popularity: recipe.popularity,
             vegan: recipe.vegan === 'true',
             vegetarian: recipe.vegetarian === 'true',
             glutenFree: recipe.glutenFree === 'true',
@@ -121,6 +121,38 @@ async function getMyRecipesPreview(recipes_id_array, user_id) {
     let ans = await Promise.all(promises);
     return ans;
 }
+
+
+/**
+ * function for create preview of my family recipe
+* params: recipes_id_array - array of recipes id's to preview
+          user_id - loggen in user's id
+* return: preview of all recipes
+ */
+async function getFamilyRecipesPreview(recipes_id_array, user_id) {
+    let promises = recipes_id_array.map(async (recipe_id) => {
+        const recipe_information = await DButils.execQuery(`select * from userrecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
+        const extract_details = recipe_information.map(recipe => ({
+            title: recipe.title,
+            id: recipe.recipe_id,
+            readyInMinutes: recipe.readyInMinutes,
+            image: recipe.image,
+            vegan: recipe.vegan === 'true',
+            vegetarian: recipe.vegetarian === 'true',
+            glutenFree: recipe.glutenFree === 'true',
+            servings: recipe.servings,
+            instructions: recipe.instructions,
+            extendedIngredients: recipe.extendedIngredients
+          }));
+          return extract_details;
+    });
+    let ans = await Promise.all(promises);
+    return ans;
+}
+
+
+
+
 
 
 
@@ -214,7 +246,7 @@ return getRecipesPreview(recipes_ids_lst, user_id);
 
 
 
-
+exports.getFamilyRecipesPreview = getFamilyRecipesPreview;
 exports.getMyRecipesPreview = getMyRecipesPreview
 exports.presentRecipe = presentRecipe;
 exports.checkIsSeen = checkIsSeen;

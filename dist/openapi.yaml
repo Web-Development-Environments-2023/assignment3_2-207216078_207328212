@@ -1,3 +1,4 @@
+
 openapi: 3.0.0
 info:
   title: Recipes api
@@ -35,8 +36,6 @@ paths:
           description: A new user has been added
         "400":
           description: wrong input parameters
-        "409":
-          description: username taken
   /login:
     post:
       tags:
@@ -155,59 +154,59 @@ paths:
   /users/createRecipe:
     post:
       tags:
-      - Users
+        - Users
       summary: Add new recipe by the loggen-in user
       description: Add the recipe to the list of the logged-in user list of recipes
       parameters:
-      - name: title
-      in: body
-      description: title of recipes
-      required: true
-      schema:
-        type: string
-        example: "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs"
-      - name: image
-      in: body
-      description: path to image of dish
-      required: true
-      schema:
-        type: string
-        example: "https://spoonacular.com/recipeImages/716429-556x370.jpg"
-      - name: readyInMinutes
-      in: body
-      description: time of ,aking the recipes in minutes
-      required: true
-      schema:
-        type: integer
-        example: 45
-      - name: vegan
-      in: body
-      description: is the dish vegan 
-      required: true
-      schema:
-        type: boolean
-        example: false
-      - name: vegetarian
-      in: body
-      description: is the dish vegetarian
-      required: true
-      schema:
-        type: boolean
-        example: false
-      - name: glutenFree
-      in: body
-      description: is the dish glutenFree
-      required: true
-      schema:
-        type: boolean
-        example: false
-      - name: servings
-      in: body
-      description: amount of servings made by the recipe
-      required: true
-      schema:
-        type: integer
-        example: 2
+        - name: title
+          in: body
+          description: title of recipes
+          required: true
+          schema:
+            type: string
+            example: "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs"
+        - name: image
+          in: body
+          description: path to image of dish
+          required: true
+          schema:
+            type: string
+            example: "https://spoonacular.com/recipeImages/716429-556x370.jpg"
+        - name: readyInMinutes
+          in: body
+          description: time of making the recipes in minutes
+          required: true
+          schema:
+            type: integer
+            example: 45
+        - name: vegan
+          in: body
+          description: is the dish vegan 
+          required: true
+          schema:
+            type: boolean
+            example: false
+        - name: vegetarian
+          in: body
+          description: is the dish vegetarian
+          required: true
+          schema:
+            type: boolean
+            example: false
+        - name: glutenFree
+          in: body
+          description: is the dish glutenFree
+          required: true
+          schema:
+            type: boolean
+            example: false
+        - name: servings
+          in: body
+          description: amount of servings made by the recipe
+          required: true
+          schema:
+            type: integer
+            example: 2
       responses:
         "200":
           description: Recipe successfully saved to user's list of recipes
@@ -265,95 +264,94 @@ paths:
         "404":
           description: recipeId is not exists
   /recipes/random:
-  get:
-    tags:
-    - Recipes
-    summary: Return 3 random recipes
-    description: Return preview details 3 random recipes
-    responses:
-      "200":
-        description: random recipes returned successfully
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecipePreview'
-      "404":
-        description: recipes not found
-
-/recipes/search/:query:
-get:
-  tags:
-  - Recipes
-  summary: Search Recipes
-  description: Search recipe using query to filter wanted recipes
-  parameters:
-    - name: number
-    in: path
-    description: number of recipes, 5/10/15
-    required: true
-    schema:
-      type: integer
-      example: 10
-    - name: query
-    in: path
-    description: Name of the food / recipe wanted
-    required: true
-    schema:
-      type: string
-      example: pasta
-    - name: cuisine
-    in: path
-    description: Cuisin(s) of the recipes, seperated by comma
-    required: false
-    schema:
-      type: string
-      example: italian
-    - name: diet
-    in: path
-    description: The diet(s) in which the recipes must be suitible, seperated by comma
-    required: false
-    schema:
-      type: string
-      example: vegeterian
-    - name: intolerance
-    in: path
-    description: All recipes returned must not contain ingredients enteres, seperated by comma
-    required: false
-    schema:
-      type: string
-      example: gluten
-  responses:
-    "200":
-      description: Desired recipes returned successfully
-      content:
-        application/json:
+    get:
+      tags:
+      - Recipes
+      summary: Return 3 random recipes
+      description: Return preview details 3 random recipes
+      responses:
+        "200":
+          description: random recipes returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreview'
+        "404":
+          description: recipes not found
+  /recipes/search/:query:
+    get:
+      tags:
+      - Recipes
+      summary: Search Recipes
+      description: Search recipe using query to filter wanted recipes
+      parameters:
+        - name: number
+          in: path
+          description: number of recipes, 5/10/15
+          required: true
           schema:
-            $ref: '#/components/schemas/RecipePreview'
-    "404":
-      description: Search failed
-/recipes/extendInfo/:recipeId:
-get:
-  tags:
-  - Recipes
-  summary: return details of recipe by id
-  description: Search recipe using id and get full information of the recipe
-  parameters:
-    - name: recipe_id
-    in: path
-    description: id of desired recipe
-    required: true
-    schema:
-      type: integer
-      example: 716429
-  responses:
-    "200":
-      description: Desired recipes returned successfully
-      content:
-        application/json:
+            type: integer
+            example: 10
+        - name: query
+          in: path
+          description: Name of the food / recipe wanted
+          required: true
           schema:
-            $ref: '#/components/schemas/RecipePreview'
-    "404":
-      description: Search failed
+            type: string
+            example: pasta
+        - name: cuisine
+          in: path
+          description: Cuisin(s) of the recipes, seperated by comma
+          required: false
+          schema:
+            type: string
+            example: italian
+        - name: diet
+          in: path
+          description: The diet(s) in which the recipes must be suitible, seperated by comma
+          required: false
+          schema:
+            type: string
+            example: vegeterian
+        - name: intolerance
+          in: path
+          description: All recipes returned must not contain ingredients enteres, seperated by comma
+          required: false
+          schema:
+            type: string
+            example: gluten
+      responses:
+        "200":
+          description: Desired recipes returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreview'
+        "404":
+          description: Search failed
+  /recipes/extendInfo/:recipeId:
+    get:
+      tags:
+      - Recipes
+      summary: return details of recipe by id
+      description: Search recipe using id and get full information of the recipe
+      parameters:
+        - name: recipe_id
+          in: path
+          description: id of desired recipe
+          required: true
+          schema:
+            type: integer
+            example: 716429
+      responses:
+        "200":
+          description: Desired recipes returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreview'
+        "404":
+          description: Search failed
 components:
   schemas:
     User:

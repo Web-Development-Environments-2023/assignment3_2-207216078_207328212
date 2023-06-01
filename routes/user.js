@@ -102,8 +102,8 @@ router.post('/createRecipe', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     // const recipe_id = req.body.recipeId;
-    let {title, image, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients} = req.body;
-    if(title == null || readyInMinutes == null || vegan == null || image == null || vegetarian == null || glutenFree == null || servings == null || instructions == null || extendedIngredients == null){
+    let {title, image , popularity, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients} = req.body;
+    if(title == null || readyInMinutes == null || vegan == null || image == null || popularity == null || vegetarian == null || glutenFree == null || servings == null || instructions == null || extendedIngredients == null){
       res.status(401).send({message: "One or more details are missing", success: false });
     }
     else{
@@ -111,9 +111,9 @@ router.post('/createRecipe', async (req,res,next) => {
         "select count(*) as count from userrecipes"
       );
       let new_recipe_id = num_of_rows[0].count + 1;
-      // instructions = JSON.stringify(instructions);
-      // extendedIngredients = JSON.stringify(extendedIngredients);
-      await user_utils.addUserRecipe(user_id, new_recipe_id, title, image, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients);
+      instructions = JSON.stringify(instructions);
+      extendedIngredients = JSON.stringify(extendedIngredients);
+      await user_utils.addUserRecipe(user_id, new_recipe_id, title, image, popularity, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients);
       res.status(200).send("The Recipe successfully saved");
     }
     } catch(error){
@@ -139,5 +139,28 @@ router.get('/myRecipes', async (req,res,next) => {
     next(error); 
   }
 });
+
+
+
+/**
+ * This path returns the user's family recipes that were saved by the logged-in user
+ */
+router.get('/familyRecipes', async (req,res,next) => {
+  try{
+    const user_id = req.session.user_id;
+    let my_recipes = {};
+    const recipes_id = await user_utils.getMyFamilyRecipes(user_id);
+    let recipes_id_array = [];
+    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
+    const results = await recipe_utils.getFamilyRecipesPreview(recipes_id_array, user_id);
+    res.status(200).send(results);
+  } catch(error){
+    next(error); 
+  }
+});
+
+
+
+
 
 module.exports = router;
