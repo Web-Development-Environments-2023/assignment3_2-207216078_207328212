@@ -34,6 +34,8 @@ paths:
       responses:
         "201":
           description: A new user has been added
+        "409":
+          description: Username taken
         "400":
           description: wrong input parameters
   /login:
@@ -60,7 +62,7 @@ paths:
                 type: string
                 example: session=87s97sdhgf279293f8w0e9
         "401":
-          description: Authentication failed
+          description: Username or Password incorrect
   /logout:
     post:
       tags:
@@ -217,7 +219,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/RecipePreview'
         "401":
-          description: One or more details are missing
+          description: user is not authorized
+        "400":
+          description: one or more details are missing
       security:
       - cookieAuth: []
   /users/myRecips:
@@ -225,6 +229,25 @@ paths:
       tags:
       - Users
       summary: Return list of the user's recipes
+      description: Get an array of recipes that were created by a specific user
+      responses:
+        "200":
+          description: user's recipes returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+  /users/familyRecipes:
+    get:
+      tags:
+      - Users
+      summary: Return list of the user's family recipes
       description: Get an array of recipes that were created by a specific user
       responses:
         "200":
@@ -256,7 +279,7 @@ paths:
           type: integer
       responses:
         "200":
-          description: data about the recipe
+          description: data about the recipe returned
           content:
             application/json:
               schema:

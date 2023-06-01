@@ -104,7 +104,7 @@ router.post('/createRecipe', async (req,res,next) => {
     // const recipe_id = req.body.recipeId;
     let {title, image , popularity, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients} = req.body;
     if(title == null || readyInMinutes == null || vegan == null || image == null || popularity == null || vegetarian == null || glutenFree == null || servings == null || instructions == null || extendedIngredients == null){
-      res.status(401).send({message: "One or more details are missing", success: false });
+      res.status(400).send({message: "One or more details are missing", success: false });
     }
     else{
       let num_of_rows = await DButils.execQuery(
