@@ -39,7 +39,12 @@ async function getRecipeDetails(recipe_id) {
 }
 
 
-
+/**
+ * function to present recipe's etxtended inforamtion
+ * praram: recipe_id : recipes id to present
+ *         user_id : cureernt user
+ * return: preview of recipe
+ */
 async function presentRecipe(recipe_id,user_id) {
     const recipe_information = await getRecipeInformation(recipe_id);
     const isFavorite = await checkIsFavorite(recipe_id, user_id);
@@ -151,11 +156,6 @@ async function getFamilyRecipesPreview(recipes_id_array, user_id) {
 }
 
 
-
-
-
-
-
 /**
  * helper function to determine whether a recipe marked as favorite by a user
  * params: recipe_id - recipe to determine isFavorite
@@ -173,7 +173,6 @@ async function checkIsFavorite(recipe_id, user_id) {
 }
 
 
-
 /**
  * helper function to determine whether a recipe marked as seen by a user
  * params: recipe_id - recipe to determine isSeen
@@ -184,9 +183,6 @@ async function checkIsSeen(recipe_id, user_id) {
     let seen = await DButils.execQuery(`select * from seenrecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
     return seen.length > 0;
 }
-
-
-
 
 
 /**
