@@ -1,3 +1,4 @@
+
 openapi: 3.0.0
 info:
   title: Recipes api
@@ -33,6 +34,8 @@ paths:
       responses:
         "201":
           description: A new user has been added
+        "409":
+          description: Username taken
         "400":
           description: wrong input parameters
   /login:
@@ -59,7 +62,7 @@ paths:
                 type: string
                 example: session=87s97sdhgf279293f8w0e9
         "401":
-          description: Authentication failed
+          description: Username or Password incorrect
   /logout:
     post:
       tags:
@@ -109,6 +112,156 @@ paths:
           description: user is not authorized
       security:
       - cookieAuth: []
+  /users/seen:
+    get:
+      tags:
+      - Users
+      summary: Return the last three recipes seen by the the loggen in user
+      description: Get an array of recipes that were seen by a specific user
+      responses:
+        "200":
+          description: data about the user's last 3 seen recipes returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+    post:
+      tags:
+      - Users
+      summary: save recipe in the seen list of a user
+      description: save recipe in the seen list of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reciepeId:
+                  type: string
+                  description: reciepe's id which the user seen
+                  example: 716429
+      responses:
+        "200":
+          description: The Recipe successfully saved as seen
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+  /users/createRecipe:
+    post:
+      tags:
+        - Users
+      summary: Add new recipe by the loggen-in user
+      description: Add the recipe to the list of the logged-in user list of recipes
+      parameters:
+        - name: title
+          in: body
+          description: title of recipes
+          required: true
+          schema:
+            type: string
+            example: "Pasta with Garlic, Scallions, Cauliflower & Breadcrumbs"
+        - name: image
+          in: body
+          description: path to image of dish
+          required: true
+          schema:
+            type: string
+            example: "https://spoonacular.com/recipeImages/716429-556x370.jpg"
+        - name: readyInMinutes
+          in: body
+          description: time of making the recipes in minutes
+          required: true
+          schema:
+            type: integer
+            example: 45
+        - name: vegan
+          in: body
+          description: is the dish vegan 
+          required: true
+          schema:
+            type: boolean
+            example: false
+        - name: vegetarian
+          in: body
+          description: is the dish vegetarian
+          required: true
+          schema:
+            type: boolean
+            example: false
+        - name: glutenFree
+          in: body
+          description: is the dish glutenFree
+          required: true
+          schema:
+            type: boolean
+            example: false
+        - name: servings
+          in: body
+          description: amount of servings made by the recipe
+          required: true
+          schema:
+            type: integer
+            example: 2
+      responses:
+        "200":
+          description: Recipe successfully saved to user's list of recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+        "400":
+          description: one or more details are missing
+      security:
+      - cookieAuth: []
+  /users/myRecips:
+    get:
+      tags:
+      - Users
+      summary: Return list of the user's recipes
+      description: Get an array of recipes that were created by a specific user
+      responses:
+        "200":
+          description: user's recipes returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
+  /users/familyRecipes:
+    get:
+      tags:
+      - Users
+      summary: Return list of the user's family recipes
+      description: Get an array of recipes that were created by a specific user
+      responses:
+        "200":
+          description: user's recipes returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
   /recipes/{recipeId}:
     get:
       tags:
@@ -126,13 +279,102 @@ paths:
           type: integer
       responses:
         "200":
-          description: data about the recipe
+          description: data about the recipe returned
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecipePreview'
         "404":
           description: recipeId is not exists
+  /recipes/random:
+    get:
+      tags:
+      - Recipes
+      summary: Return 3 random recipes
+      description: Return preview details 3 random recipes
+      responses:
+        "200":
+          description: random recipes returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreview'
+        "404":
+          description: recipes not found
+  /recipes/search/:query:
+    get:
+      tags:
+      - Recipes
+      summary: Search Recipes
+      description: Search recipe using query to filter wanted recipes
+      parameters:
+        - name: number
+          in: path
+          description: number of recipes, 5/10/15
+          required: true
+          schema:
+            type: integer
+            example: 10
+        - name: query
+          in: path
+          description: Name of the food / recipe wanted
+          required: true
+          schema:
+            type: string
+            example: pasta
+        - name: cuisine
+          in: path
+          description: Cuisin(s) of the recipes, seperated by comma
+          required: false
+          schema:
+            type: string
+            example: italian
+        - name: diet
+          in: path
+          description: The diet(s) in which the recipes must be suitible, seperated by comma
+          required: false
+          schema:
+            type: string
+            example: vegeterian
+        - name: intolerance
+          in: path
+          description: All recipes returned must not contain ingredients enteres, seperated by comma
+          required: false
+          schema:
+            type: string
+            example: gluten
+      responses:
+        "200":
+          description: Desired recipes returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreview'
+        "404":
+          description: Search failed
+  /recipes/extendInfo/:recipeId:
+    get:
+      tags:
+      - Recipes
+      summary: return details of recipe by id
+      description: Search recipe using id and get full information of the recipe
+      parameters:
+        - name: recipe_id
+          in: path
+          description: id of desired recipe
+          required: true
+          schema:
+            type: integer
+            example: 716429
+      responses:
+        "200":
+          description: Desired recipes returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePreview'
+        "404":
+          description: Search failed
 components:
   schemas:
     User:
