@@ -118,8 +118,8 @@ async function getMyRecipesPreview(recipes_id_array, user_id) {
             vegan: recipe.vegan === 'true',
             vegetarian: recipe.vegetarian === 'true',
             glutenFree: recipe.glutenFree === 'true',
-            seen: isFavorite,
-            favorite: isSeen
+            seen: isSeen,
+            favorite: isFavorite
           }));
           return extract_details;
     });
@@ -137,17 +137,19 @@ async function getMyRecipesPreview(recipes_id_array, user_id) {
 async function getFamilyRecipesPreview(recipes_id_array, user_id) {
     let promises = recipes_id_array.map(async (recipe_id) => {
         const recipe_information = await DButils.execQuery(`select * from userrecipes where user_id = '${user_id}' and recipe_id = '${recipe_id}'`);
+        let ingredients = await DButils.execQuery(`select ingredient_name, amount, units from ingredients where recipe_id = '${recipe_id}'`);
         const extract_details = recipe_information.map(recipe => ({
             title: recipe.title,
             id: recipe.recipe_id,
             readyInMinutes: recipe.readyInMinutes,
             image: recipe.image,
+            popularity : recipe.popularity,
             vegan: recipe.vegan === 'true',
             vegetarian: recipe.vegetarian === 'true',
             glutenFree: recipe.glutenFree === 'true',
             servings: recipe.servings,
             instructions: recipe.instructions,
-            extendedIngredients: recipe.extendedIngredients
+            extendedIngredients: ingredients
           }));
           return extract_details;
     });
@@ -240,6 +242,26 @@ const recipes_ids_lst = response.data.results.map((recipe_info) => {
 return getRecipesPreview(recipes_ids_lst, user_id);
 }
 
+async function getMyReviewRecipe(user_id, recipe_id){
+    let my_recipe = await DButils.execQuery(`select * from userrecipes where user_id = '${user_id}' AND recipe_id = '${recipe_id}'`);
+    if (my_recipe.length == 0)
+        return {};
+    let ingredients = await DButils.execQuery(`select ingredient_name, amount, units from ingredients where recipe_id = '${recipe_id}'`);
+    return {
+        title: my_recipe.title,
+        id: my_recipe.recipe_id,
+        readyInMinutes: my_recipe.readyInMinutes,
+        image: my_recipe.image,
+        popularity : my_recipe.popularity,
+        vegan: my_recipe.vegan === 'true',
+        vegetarian: my_recipe.vegetarian === 'true',
+        glutenFree: my_recipe.glutenFree === 'true',
+        servings: my_recipe.servings,
+        instructions: my_recipe.instructions,
+        extendedIngredients: ingredients
+    }
+}
+
 
 
 exports.getFamilyRecipesPreview = getFamilyRecipesPreview;
@@ -251,6 +273,7 @@ exports.getRecipeDetails = getRecipeDetails;
 exports.getRecipesPreview = getRecipesPreview;
 exports.getRandomThreeRecipes = getRandomThreeRecipes;
 exports.searchRecipes = searchRecipes;
+exports.getMyReviewRecipe = getMyReviewRecipe;
 
 
 

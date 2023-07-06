@@ -8,6 +8,8 @@ const recipe_utils = require("./utils/recipes_utils");
  * Authenticate all incoming requests by middleware
  */
 router.use(async function (req, res, next) {
+  console.log("ths req.session.user_id is:")
+  console.log(req.session)
   if (req.session && req.session.user_id) {
     DButils.execQuery("SELECT user_id FROM users").then((users) => {
       if (users.find((x) => x.user_id === req.session.user_id)) {
@@ -53,7 +55,71 @@ router.get('/favorites', async (req,res,next) => {
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
     const results = await recipe_utils.getRecipesPreview(recipes_id_array, user_id);
+    // let recipes = [
+    //   {
+    //         id: "716429",
+    //         title: "pizassssssssssssssssssssssssza",
+    //         readyInMinutes: "45",
+    //         image: null,
+    //         popularity: "50",
+    //         vegan: true,
+    //         vegetarian: false,
+    //         glutenFree: true,
+    //         seen: false,
+    //         favorite: false
+    //   },
+    //   {
+    //     id: "716429",
+    //     title: "pizza124",
+    //     readyInMinutes: "60",
+    //     image: "https://spoonacular.com/recipeImages/641799-556x370.jpg",
+    //     popularity: "50",
+    //     vegan: true,
+    //     vegetarian: true,
+    //     glutenFree: false,
+    //     seen: false,
+    //     favorite: false
+    //   },
+    //   {
+    //     id: "636768",
+    //         title: "pizza12",
+    //         readyInMinutes: "45",
+    //         image: "https://spoonacular.com/recipeImages/641799-556x370.jpg",
+    //         popularity: "50",
+    //         vegan: true,
+    //         vegetarian: true,
+    //         glutenFree: true,
+    //         seen: false,
+    //         favorite: false
+    //   },
+    //   {
+    //     id: "716429",
+    //     title: "pizza124",
+    //     readyInMinutes: "60",
+    //     image: "https://spoonacular.com/recipeImages/641799-556x370.jpg",
+    //     popularity: "50",
+    //     vegan: true,
+    //     vegetarian: true,
+    //     glutenFree: false,
+    //     seen: false,
+    //     favorite: false
+    //   },
+    //   {
+    //     id: "636768",
+    //         title: "pizza12",
+    //         readyInMinutes: "45",
+    //         image: "https://spoonacular.com/recipeImages/641799-556x370.jpg",
+    //         popularity: "50",
+    //         vegan: true,
+    //         vegetarian: true,
+    //         glutenFree: true,
+    //         seen: false,
+    //         favorite: false
+    //   }
+    // ]
     res.status(200).send(results);
+    // res.status(200).send(recipes);
+
   } catch(error){
     next(error); 
   }
@@ -71,9 +137,51 @@ router.get("/seen", async (req, res, next) => {
     recipes.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
     if (recipes_id_array.length == 0){
       res.status(200).send({ message: "No recently viewed recipes found", success: true });
+      return;
     }
+    // let recipes = [
+    //   {
+    //         id: "716429",
+    //         title: "pizassssssssssssssssssssssssza",
+    //         readyInMinutes: "45",
+    //         // image: "https://spoonacular.com/recipeImages/641799-556x370.jpg",
+    //         image: null,
+    //         popularity: "50",
+    //         vegan: true,
+    //         vegetarian: true,
+    //         glutenFree: true,
+    //         seen: false,
+    //         favorite: false
+    //   },
+    //   {
+    //     id: "716429",
+    //     title: "pizza124",
+    //     readyInMinutes: "60",
+    //     image: "https://spoonacular.com/recipeImages/641799-556x370.jpg",
+    //     popularity: "50",
+    //     vegan: true,
+    //     vegetarian: true,
+    //     glutenFree: true,
+    //     seen: false,
+    //     favorite: false
+    //   },
+    //   {
+    //     id: "636768",
+    //         title: "pizza12",
+    //         readyInMinutes: "45",
+    //         image: "https://spoonacular.com/recipeImages/641799-556x370.jpg",
+    //         popularity: "50",
+    //         vegan: true,
+    //         vegetarian: true,
+    //         glutenFree: true,
+    //         seen: false,
+    //         favorite: false
+    //   }
+    // ]
     const results = await recipe_utils.getRecipesPreview(recipes_id_array, user_id);
     res.status(200).send(results);
+      // res.status(200).send(recipes);
+
   } catch (error) {
     next(error);
   }
@@ -101,7 +209,6 @@ router.post('/seen', async (req,res,next) => {
 router.post('/createRecipe', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    // const recipe_id = req.body.recipeId;
     let {title, image , popularity, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients} = req.body;
     if(title == null || readyInMinutes == null || vegan == null || image == null || popularity == null || vegetarian == null || glutenFree == null || servings == null || instructions == null || extendedIngredients == null){
       res.status(400).send({message: "One or more details are missing", success: false });
@@ -111,9 +218,11 @@ router.post('/createRecipe', async (req,res,next) => {
         "select count(*) as count from userrecipes"
       );
       let new_recipe_id = num_of_rows[0].count + 1;
-      instructions = JSON.stringify(instructions);
-      extendedIngredients = JSON.stringify(extendedIngredients);
-      await user_utils.addUserRecipe(user_id, new_recipe_id, title, image, popularity, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, extendedIngredients);
+      // instructions = JSON.stringify(instructions);
+      await user_utils.addUserRecipe(user_id, new_recipe_id, title, image, popularity, readyInMinutes, vegan, vegetarian, glutenFree, servings, instructions, '');
+      extendedIngredients.map(async (ing) => {
+        await DButils.execQuery(`insert into ingredients values ('${new_recipe_id}', '${ing.name}', '${ing.amount}', '${ing.units}')`);
+    });
       res.status(200).send("The Recipe successfully saved");
     }
     } catch(error){
@@ -126,14 +235,14 @@ router.post('/createRecipe', async (req,res,next) => {
 /**
  * This path returns the user's recipes that were saved by the logged-in user
  */
-router.get('/myRecipes', async (req,res,next) => {
+router.get('/myRecipesPreview', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    let my_recipes = {};
     const recipes_id = await user_utils.getMyRecipes(user_id);
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
     const results = await recipe_utils.getMyRecipesPreview(recipes_id_array, user_id);
+    console.log(results)
     res.status(200).send(results);
   } catch(error){
     next(error); 

@@ -21,6 +21,7 @@ async function getLastThreeSeenRecipes(user_id){
 
 //  mark recipe with id recipe_id as seen by user with user_id
 async function markAsSeen(user_id, recipe_id){
+    await DButils.execQuery(`delete from seenrecipes where user_id = '${user_id}' AND recipe_id = '${recipe_id}'`);
     await DButils.execQuery(`insert into seenrecipes values ('${user_id}',${recipe_id},CURRENT_TIMESTAMP)`);
 }
 
@@ -31,8 +32,8 @@ async function addUserRecipe(user_id, new_recipe_id, title, image, popularity, r
 
 //  get all recipes created by user with user_id
 async function getMyRecipes(user_id){
-    let popularity = -1;
-    const recipes_id = await DButils.execQuery(`select recipe_id from userrecipes where user_id='${user_id}' and popularity!='${popularity}'`);
+    let popularity = -2;
+    const recipes_id = await DButils.execQuery(`select recipe_id from userrecipes where user_id='${user_id}' and popularity='${popularity}'`);
     return recipes_id;
 }
 
