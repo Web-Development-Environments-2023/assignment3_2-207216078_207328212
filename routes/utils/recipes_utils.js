@@ -248,16 +248,16 @@ async function getMyReviewRecipe(user_id, recipe_id){
         return {};
     let ingredients = await DButils.execQuery(`select ingredient_name, amount, units from ingredients where recipe_id = '${recipe_id}'`);
     return {
-        title: my_recipe.title,
-        id: my_recipe.recipe_id,
-        readyInMinutes: my_recipe.readyInMinutes,
-        image: my_recipe.image,
-        popularity : my_recipe.popularity,
-        vegan: my_recipe.vegan === 'true',
-        vegetarian: my_recipe.vegetarian === 'true',
-        glutenFree: my_recipe.glutenFree === 'true',
-        servings: my_recipe.servings,
-        instructions: my_recipe.instructions,
+        title: my_recipe[0].title,
+        id: my_recipe[0].recipe_id,
+        readyInMinutes: my_recipe[0].readyInMinutes,
+        image: my_recipe[0].image,
+        popularity : my_recipe[0].popularity,
+        vegan: my_recipe[0].vegan === 'true',
+        vegetarian: my_recipe[0].vegetarian === 'true',
+        glutenFree: my_recipe[0].glutenFree === 'true',
+        servings: my_recipe[0].servings,
+        instructions: my_recipe[0].instructions,
         extendedIngredients: ingredients
     }
 }

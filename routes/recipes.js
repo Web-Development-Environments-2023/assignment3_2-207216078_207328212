@@ -143,7 +143,7 @@ router.get("/extendInfo/:recipe_id", async (req, res, next) => {
     }
     else{
     // My Recipes
-      recipe = await recipes_utils.getMyReviewRecipe(user_id, recipe_id);
+      recipe = await recipes_utils.getMyReviewRecipe(user_id, req.params.recipe_id);
     }
     res.send(recipe);
   } catch (error) {
